@@ -1,6 +1,8 @@
 import { BaseEntity } from "../../modules/bases/entities/base.entity";
-import { Column, Entity } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { UserType } from "../enum/user-type.enum";
+import * as bcrypt from 'bcrypt';
+
 
 @Entity()
 export class User extends BaseEntity {
@@ -15,4 +17,12 @@ export class User extends BaseEntity {
     
     @Column()
     password!: string;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    async hashPassword() {
+        if (this.password) {
+            this.password = await bcrypt.hash(this.password, 10);
+        }
+    }
 }

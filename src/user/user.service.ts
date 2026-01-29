@@ -4,7 +4,6 @@ import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
 import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -13,11 +12,6 @@ export class UserService {
         private userRepository: Repository<User>,
     ) {}
 
-    async hashPassword(password: string): Promise<string> {
-        const saltRounds = 10; // Custo do processamento
-        return await bcrypt.hash(password, saltRounds);
-    }
-
     async create(data: CreateUserInput): Promise<User> {
         const emailExists = await this.userRepository.findOne({ where: { email: data.email } })
         
@@ -25,8 +19,7 @@ export class UserService {
             throw new ConflictException('Email já cadastrado')
         }
         
-        const hashedPassword = await this.hashPassword(data.password)
-        const userData = this.userRepository.create({ ...data, password: hashedPassword});
+        const userData = this.userRepository.create(data);
         
         try {
             const newUser = await this.userRepository.save(userData);
@@ -63,10 +56,9 @@ export class UserService {
             throw new NotFoundException(`Usuário com id ${id} não encontrado`);
         }
 
-        await this.userRepository.update(user, { ...data });
-        const userUpdated = this.userRepository.create({ ...user, ...data });
+        Object.assign(user, data);
 
-        return await this.userRepository.save(userUpdated);
+        return await this.userRepository.save(user);
     }
 
     async deleteUser(id: string): Promise<User> {
