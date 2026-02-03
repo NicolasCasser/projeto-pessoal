@@ -4,10 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { UserResolver } from './user/user.resolver';
 import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
 import { AppDataSource } from './database/data-source';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +21,7 @@ import { AppDataSource } from './database/data-source';
       })
     }),
     UserModule,
+    AuthModule
   ],
   providers: [],
 })

@@ -46,4 +46,10 @@ export class UserResolver {
         const user = await this.userService.findById(id);
         return user;
     }
+
+    @Query(() => UserDTO)
+    async findUserByEmail(@Args('email') email: string): Promise<User> {
+        const user = await this.userService.findByEmail(email);
+        return user;
+    }
 }
